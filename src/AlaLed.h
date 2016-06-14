@@ -3,7 +3,6 @@
 
 #include "Ala.h"
 
-
 /**
  *  AlaLed can be used to drive a single or multiple output channels to perform animations.
  *  Single leds can be attached to each channel or MOSFETS/relays can be used to drive
@@ -44,7 +43,7 @@ public:
     * It can be used also to drive a single led.
     */
     void initTLC5940(int numLeds, byte *pins);
-
+    void initPCA9685(int numLeds, byte *pins);
 
     /**
     * Sets the maximum brightness level (0-255).

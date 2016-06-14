@@ -1,6 +1,7 @@
 #include "AlaLed.h"
 
 #include "ExtTlc5940.h"
+#include "ExtPca9685.h"
 
 
 AlaLed::AlaLed()
@@ -11,7 +12,6 @@ AlaLed::AlaLed()
 	lastRefreshTime = 0;
 	refreshMillis = 1000/50;
 }
-
 
 
 void AlaLed::initPWM(byte pin)
@@ -57,8 +57,25 @@ void AlaLed::initTLC5940(int numLeds, byte *pins)
 		isTlcInit=true;
 	}
 }
-	
 
+void AlaLed::initPCA9685(int numLeds, byte *pins)
+{
+	this->driver = ALA_PCA9685;
+	this->numLeds = numLeds;
+	this->pins = pins;
+
+	// allocate and clear leds array
+	leds = (byte *)malloc(numLeds);
+	memset(leds, 0, numLeds);
+
+	// call Tlc.init only once
+	static bool isPcaInit = false;
+	if(!isPcaInit)
+	{
+		Pca.init();
+		isPcaInit=true;
+	}
+}
 
 void AlaLed::setBrightness(byte maxOut)
 {
@@ -142,11 +159,16 @@ void AlaLed::runAnimation()
 		{
 			for(int i=0; i<numLeds; i++)
 				Tlc.set(pins[i], leds[i]*16);
-			
+
             Tlc.update();
 		}
+		else if(driver==ALA_PCA9685)
+		{
+			for(int i=0; i<numLeds; i++)
+				Pca.setLedAmount(pins[i], leds[i]*16);
+		}
 	}
-	
+
 }
 
 
